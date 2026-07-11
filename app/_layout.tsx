@@ -32,6 +32,21 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      
+      // 異步初始化推送通知，防阻塞主線程
+      const initPush = async () => {
+        try {
+          const { registerForPushNotificationsAsync } = await import('@/services/push');
+          const token = await registerForPushNotificationsAsync();
+          if (token) {
+            console.log('App Push Token successfully registered:', token);
+            // TODO: 當後端 API 就緒時，調用 my.bdfz.net/api/user/push-token 進行綁定
+          }
+        } catch (e) {
+          console.error('Failed to initialize push during startup', e);
+        }
+      };
+      initPush();
     }
   }, [loaded]);
 
