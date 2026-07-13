@@ -22,8 +22,8 @@ Book extraction looks for sibling reader repositories next to this checkout. Ove
 
 ## Security model
 
-- Session values are stored with `expo-secure-store` and are never printed.
-- Only structurally valid User Center sessions from `my.bdfz.net` or `uc.bdfz.net` may cross the WebView bridge.
+- Native session values are stored with `expo-secure-store` and are never printed or exposed through page JavaScript.
+- User Center keeps its browser cookie `HttpOnly`; login crosses into the app through a 90-second, one-time handoff code that is exchanged by the native client.
 - Embedded navigation is limited to trusted BDFZ/RDFZ HTTPS hosts.
 - HTTP and mixed content are blocked in WebView. The one legacy HTTP cinema entry opens externally without a session bridge.
 - The app does not request notification permission or collect a device push token.
@@ -46,6 +46,8 @@ npm run release:android -- --publish
 ```
 
 This creates a signed GitHub Release and uploads the same APK to the versioned R2 key and the fixed `latest.apk` URL. Run `--build-only` to build and verify without external writes.
+
+Public release APKs include the physical-device ABIs `arm64-v8a` and `armeabi-v7a`. Use a development build for x86/x86_64 emulators.
 
 ## License
 

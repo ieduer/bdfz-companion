@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 const TOKEN_KEY = 'bdfz_uc_session';
+const NATIVE_HANDOFF_CLIENT = 'bdfz-companion';
 
 export function isValidSessionToken(token: unknown): token is string {
   return typeof token === 'string'
@@ -33,6 +34,27 @@ export async function deleteToken(): Promise<void> {
 export async function isAuthenticated(): Promise<boolean> {
   const token = await getToken();
   return isValidSessionToken(token);
+}
+
+export async function exchangeNativeSessionHandoff(code: string): Promise<{ token: string; user: any }> {
+  const normalizedCode = String(code || '').trim().toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(normalizedCode)) {
+    throw new Error('Invalid native session handoff');
+  }
+
+  const response = await fetch('https://my.bdfz.net/api/session/native-exchange', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ client: NATIVE_HANDOFF_CLIENT, code: normalizedCode }),
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !isValidSessionToken(data?.token)) {
+    throw new Error(`Native session exchange failed: ${response.status}`);
+  }
+  return { token: data.token, user: data.user || null };
 }
 
 export async function fetchFromUserCenter(path: string, options: RequestInit = {}): Promise<any> {

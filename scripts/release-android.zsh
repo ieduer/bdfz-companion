@@ -9,6 +9,7 @@ BUCKET="blog-images"
 R2_PREFIX="apps/bdfz-companion"
 PUBLIC_BASE="https://img.bdfz.net/$R2_PREFIX"
 SECRETS_FILE="${BDFZ_SECRETS_FILE:-$HOME/.secrets.env}"
+ANDROID_ABIS="armeabi-v7a,arm64-v8a"
 
 if [[ "$MODE" != '--build-only' && "$MODE" != '--publish' ]]; then
   print -u2 'Usage: npm run release:android -- --build-only|--publish'
@@ -47,7 +48,8 @@ node scripts/configure-android-signing.mjs
 
 (
   cd android
-  NODE_ENV=production ./gradlew --no-daemon clean assembleRelease
+  NODE_ENV=production ./gradlew --no-daemon clean assembleRelease \
+    -PreactNativeArchitectures="$ANDROID_ABIS"
 )
 
 mkdir -p "$OUTPUT_DIR"

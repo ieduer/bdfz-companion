@@ -13,7 +13,7 @@ import { useRouter, useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, SPACING, RADIUS, getThemeSettings, updateThemeSettings } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { isAuthenticated, deleteToken, saveToken, fetchFromUserCenter } from '@/services/auth';
+import { isAuthenticated, deleteToken, fetchFromUserCenter } from '@/services/auth';
 
 export default function MeScreen() {
   const router = useRouter();

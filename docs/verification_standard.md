@@ -46,7 +46,7 @@ The release build must use the private BDFZ release keystore. A debug-signed APK
 
 1. Launch the installed APK and confirm Home, Learn, Community, Tools, and Me remain reachable.
 2. Open Me -> `意見反饋` and verify the form has no horizontal overflow.
-3. Open `連接用戶中心`, log in, and confirm session sync without exposing the token in logs.
+3. Open `連接用戶中心`, log in, accept the success dialog, return to Me, and confirm the page changes from guest to the authenticated profile. Confirm no token appears in page JavaScript or logs.
 4. Confirm an untrusted deep-link URL is blocked and the HTTP cinema entry opens only in the system browser.
 5. Run `npm run verify`, `npm audit --omit=dev`, and the shared-hub probes.
 6. Verify the GitHub release APK and fixed R2 APK have the same SHA-256 and signing certificate.
@@ -71,3 +71,5 @@ npm run release:android -- --publish
 ```
 
 The script verifies the source, regenerates Android, injects signing configuration using environment variable names only, builds and verifies the APK, creates the GitHub release, then uploads the versioned and fixed R2 objects.
+
+The public APK contains `arm64-v8a` and `armeabi-v7a`; x86/x86_64 are development-emulator targets and are intentionally excluded from the release artifact.

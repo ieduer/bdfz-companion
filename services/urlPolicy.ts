@@ -40,6 +40,16 @@ export function isTrustedSessionBridgeUrl(value: unknown): boolean {
   );
 }
 
+export function getNativeSessionBootstrapUrl(value: unknown): string | null {
+  const trusted = getTrustedWebViewUrl(value);
+  if (!trusted) return null;
+  const target = new URL(trusted);
+  if (target.hostname !== 'bdfz.net' && !target.hostname.endsWith('.bdfz.net')) return null;
+  const bridge = new URL('https://my.bdfz.net/api/session/bridge');
+  bridge.searchParams.set('returnTo', target.href);
+  return bridge.href;
+}
+
 export function isExternalOnlyUrl(value: unknown): boolean {
   const parsed = parseHttpUrl(value);
   return Boolean(parsed && EXTERNAL_ONLY_URLS.has(parsed.href));

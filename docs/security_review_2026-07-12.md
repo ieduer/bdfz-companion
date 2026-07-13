@@ -7,9 +7,9 @@ Scope: application source, generated Android configuration, dependency manifests
 ### High — arbitrary WebView navigation and session bridge
 
 - Location: `app/webview.tsx`, `services/urlPolicy.ts`, `services/auth.ts`
-- Evidence: the prior route accepted an arbitrary URL parameter, injected the User Center cookie, and accepted cookie messages without validating the page URL or token shape.
+- Evidence: the prior route accepted an arbitrary URL parameter and attempted to read or inject the User Center session through page JavaScript. Because the production cookie is correctly `HttpOnly`, login could appear successful while the native app remained a guest; weakening the cookie would instead have exposed the session to WebView script.
 - Impact: a crafted app link or untrusted navigation could expose or replace session state.
-- Remediation: embedded pages are now restricted to approved BDFZ/RDFZ HTTPS roots; external HTTPS navigation leaves the WebView; only `my.bdfz.net` and `uc.bdfz.net` can return a structurally valid session; file access, mixed content, extra windows, geolocation, and third-party cookies are disabled.
+- Remediation: embedded pages are restricted to approved BDFZ/RDFZ HTTPS roots; external HTTPS navigation leaves the WebView; file access, mixed content, extra windows, geolocation, and third-party cookies are disabled. User Center now issues a random 90-second, one-time native handoff code. D1 stores only its HMAC, browser-origin exchange attempts are rejected, and the native client consumes it before saving a newly minted session in SecureStore. Existing native sessions enter BDFZ WebViews through the server-side `/api/session/bridge`, which restores an `HttpOnly` cookie without `document.cookie` injection.
 - Status: remediated and covered by `scripts/test-url-policy.mjs`.
 
 ### Medium — cleartext service embedded with account bridge
@@ -59,5 +59,6 @@ Scope: application source, generated Android configuration, dependency manifests
 ## Residual risk
 
 - Trusted web applications execute JavaScript inside WebView and therefore remain part of the app's security boundary.
+- A compromised trusted User Center page could request a short-lived handoff code, but cannot exchange it from browser JavaScript; codes are single-use, expire after 90 seconds, and are stored server-side only as HMAC values.
 - The legacy cinema endpoint remains cleartext in the external browser until its operator provides HTTPS.
 - The Android signing keystore is a long-lived update identity and must be backed up in the approved secret store; loss prevents compatible updates.

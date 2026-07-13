@@ -22,8 +22,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { deleteToken, getToken, isValidSessionToken, saveToken } from '@/services/auth';
 import {
+  deleteToken,
+  exchangeNativeSessionHandoff,
+  getToken,
+  isValidSessionToken,
+  saveToken,
+} from '@/services/auth';
+import {
+  getNativeSessionBootstrapUrl,
   getSafeExternalNavigationUrl,
   getTrustedWebViewUrl,
   isExternalOnlyUrl,
@@ -46,10 +53,12 @@ export default function WebViewScreen() {
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const webViewRef = useRef<WebView>(null);
+  const handoffInFlightRef = useRef(false);
 
   const [canGoBack, setCanGoBack] = useState(false);
   const [currentUrl, setCurrentUrl] = useState(initialUrl || '');
   const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [tokenReady, setTokenReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(Boolean(initialUrl));
 
@@ -66,6 +75,7 @@ export default function WebViewScreen() {
       } else if (token) {
         await deleteToken();
       }
+      setTokenReady(true);
     }
     loadToken();
     return () => { active = false; };
@@ -113,16 +123,19 @@ export default function WebViewScreen() {
     if (typeof raw !== 'string' || raw.length > 5000) return;
     try {
       const data = JSON.parse(raw);
-      if (data?.type !== 'cookie' || !isValidSessionToken(data.token)) return;
-      const currentToken = await getToken();
-      if (currentToken === data.token) return;
-      await saveToken(data.token);
-      setSessionToken(data.token);
+      if (data?.type !== 'native-handoff' || !/^[a-f0-9]{64}$/.test(String(data.code || ''))) return;
+      if (handoffInFlightRef.current) return;
+      handoffInFlightRef.current = true;
+      const exchanged = await exchangeNativeSessionHandoff(data.code);
+      await saveToken(exchanged.token);
+      setSessionToken(exchanged.token);
       Alert.alert('連接成功', '已成功與 BDFZ 用戶中心同步！', [
         { text: '確定', onPress: () => router.back() },
       ]);
     } catch {
-      // Ignore malformed or unrelated WebView messages.
+      // The page retries with a new short-lived handoff while it remains open.
+    } finally {
+      handoffInFlightRef.current = false;
     }
   }, [router]);
 
@@ -144,31 +157,52 @@ export default function WebViewScreen() {
     await Share.share({ message: `${title}: ${currentUrl}` }).catch(() => {});
   }, [currentUrl, title]);
 
-  const cookieScript = useMemo(() => {
-    if (!sessionToken) return '';
-    const tokenJson = JSON.stringify(sessionToken);
-    return `(function(){
-      var token=${tokenJson};
-      var host=location.hostname.toLowerCase();
-      if(host==='bdfz.net'||host.endsWith('.bdfz.net')){
-        document.cookie='bdfz_uc_session='+token+'; domain=.bdfz.net; path=/; secure; SameSite=Lax';
-      }
-      if(host==='rdfzer.com'||host.endsWith('.rdfzer.com')){
-        document.cookie='bdfz_uc_session='+token+'; domain=.rdfzer.com; path=/; secure; SameSite=Lax';
-      }
-    })(); true;`;
-  }, [sessionToken]);
+  const nativeBootstrapUrl = useMemo(
+    () => (sessionToken && initialUrl ? getNativeSessionBootstrapUrl(initialUrl) : null),
+    [initialUrl, sessionToken],
+  );
+  const webViewSource = useMemo(() => {
+    if (!initialUrl) return null;
+    if (nativeBootstrapUrl && sessionToken) {
+      return {
+        uri: nativeBootstrapUrl,
+        headers: { Cookie: `bdfz_uc_session=${sessionToken}` },
+      };
+    }
+    return { uri: initialUrl };
+  }, [initialUrl, nativeBootstrapUrl, sessionToken]);
 
-  const afterLoadScript = `(function(){
+  const afterLoadScript = useMemo(() => {
+    if (sessionToken || !initialUrl || !isTrustedSessionBridgeUrl(initialUrl)) return 'true;';
+    return `(function(){
     var host=location.hostname.toLowerCase();
     if(host!=='my.bdfz.net'&&host!=='uc.bdfz.net') return true;
-    function sendSession(){
-      var match=document.cookie.match(new RegExp('(^| )bdfz_uc_session=([^;]+)'));
-      if(match) window.ReactNativeWebView.postMessage(JSON.stringify({type:'cookie',token:match[2]}));
+    var handoffBusy=false;
+    async function sendSessionHandoff(){
+      if(handoffBusy) return;
+      handoffBusy=true;
+      try {
+        var response=await fetch('/api/session/native-handoff',{
+          method:'POST',
+          credentials:'same-origin',
+          headers:{'Accept':'application/json','Content-Type':'application/json'},
+          body:JSON.stringify({client:'bdfz-companion'})
+        });
+        if(!response.ok) return;
+        var data=await response.json();
+        if(data&&data.ok&&/^[a-f0-9]{64}$/.test(String(data.code||''))){
+          window.ReactNativeWebView.postMessage(JSON.stringify({type:'native-handoff',code:data.code}));
+        }
+      } catch (_) {
+        // Login may still be in progress; the interval retries.
+      } finally {
+        handoffBusy=false;
+      }
     }
-    sendSession();
-    window.setInterval(sendSession,2000);
+    sendSessionHandoff();
+    window.setInterval(sendSessionHandoff,3000);
   })(); true;`;
+  }, [initialUrl, sessionToken]);
 
   const progressBarStyle = useAnimatedStyle(() => ({
     width: `${Math.min(progress.value * 100, 100)}%` as `${number}%`,
@@ -223,10 +257,10 @@ export default function WebViewScreen() {
       </Animated.View>
 
       <View style={styles.webViewWrapper}>
-        {initialUrl ? (
+        {initialUrl && tokenReady && webViewSource ? (
           <WebView
             ref={webViewRef}
-            source={{ uri: initialUrl }}
+            source={webViewSource}
             originWhitelist={['https://*']}
             onShouldStartLoadWithRequest={handleShouldStartLoad}
             onNavigationStateChange={handleNavigationStateChange}
@@ -236,7 +270,6 @@ export default function WebViewScreen() {
             onLoadEnd={() => setIsLoading(false)}
             onError={() => { setHasError(true); setIsLoading(false); }}
             onHttpError={() => { setHasError(true); setIsLoading(false); }}
-            injectedJavaScriptBeforeContentLoaded={cookieScript}
             injectedJavaScript={afterLoadScript}
             sharedCookiesEnabled
             thirdPartyCookiesEnabled={false}
@@ -252,7 +285,7 @@ export default function WebViewScreen() {
             allowsBackForwardNavigationGestures
             style={styles.webView}
           />
-        ) : (
+        ) : !initialUrl ? (
           <View style={[styles.errorOverlay, { backgroundColor: colors.bgPrimary }]}>
             <Ionicons name={externalOnly ? 'open-outline' : 'shield-checkmark-outline'} size={48} color={colors.accent} />
             <Text style={[styles.errorTitle, { color: colors.textPrimary }]}>
@@ -272,7 +305,7 @@ export default function WebViewScreen() {
               </Pressable>
             )}
           </View>
-        )}
+        ) : null}
 
         {isLoading && !hasError && initialUrl && (
           <View pointerEvents="none" style={styles.loadingOverlay}>

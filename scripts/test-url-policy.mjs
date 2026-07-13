@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  getNativeSessionBootstrapUrl,
   getSafeExternalNavigationUrl,
   getTrustedWebViewUrl,
   isExternalOnlyUrl,
@@ -17,6 +18,12 @@ assert.equal(isTrustedWebViewUrl('https://my.bdfz.net:8443/'), false);
 assert.equal(isExternalOnlyUrl('http://bdfz-cinema.bdfz.net:8765/'), true);
 assert.equal(isExternalOnlyUrl('http://bdfz-cinema.bdfz.net:8765.evil.example/'), false);
 assert.equal(isTrustedSessionBridgeUrl('https://my.bdfz.net/'), true);
+assert.equal(
+  getNativeSessionBootstrapUrl('https://yw.bdfz.net/#lesson-1'),
+  'https://my.bdfz.net/api/session/bridge?returnTo=https%3A%2F%2Fyw.bdfz.net%2F%23lesson-1',
+);
+assert.equal(getNativeSessionBootstrapUrl('https://rdfzer.com/'), null);
+assert.equal(getNativeSessionBootstrapUrl('https://bdfz.net.evil.example/'), null);
 assert.equal(isTrustedSessionBridgeUrl('https://gk.bdfz.net/'), false);
 assert.equal(getSafeExternalNavigationUrl('https://example.org/help'), 'https://example.org/help');
 assert.equal(getSafeExternalNavigationUrl('http://example.org/'), null);
