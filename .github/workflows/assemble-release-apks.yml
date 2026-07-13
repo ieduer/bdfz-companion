@@ -1,0 +1,69 @@
+name: Assemble release APKs
+
+run-name: Assemble ${{ inputs.tag }} APKs
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to assemble
+        required: true
+        type: string
+      staging_ref:
+        description: Temporary release-assets branch
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG_INPUT: ${{ inputs.tag }}
+      STAGING_REF_INPUT: ${{ inputs.staging_ref }}
+    steps:
+      - name: Validate and fetch staging branch
+        run: |
+          set -euo pipefail
+          TAG="$TAG_INPUT"
+          STAGING_REF="$STAGING_REF_INPUT"
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$STAGING_REF" =~ ^release-assets-v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]
+          gh repo clone "$GITHUB_REPOSITORY" staging -- --branch "$STAGING_REF" --depth 1
+          jq -e --arg tag "$TAG" --arg stagingRef "$STAGING_REF" '
+            .schemaVersion == 1
+            and .tag == $tag
+            and .stagingRef == $stagingRef
+            and (.artifacts | type == "array" and length > 0)
+            and all(.artifacts[];
+              (.name | test("^[A-Za-z0-9._-]+\\.apk$"))
+              and (.path | test("^artifacts/[A-Za-z0-9._-]+\\.apk$"))
+              and (.sha256 | test("^[a-f0-9]{64}$"))
+              and (.size | type == "number" and . > 0)
+            )
+          ' staging/parts-manifest.json >/dev/null
+
+      - name: Assemble, verify and upload APKs
+        run: |
+          set -euo pipefail
+          TAG="$TAG_INPUT"
+          jq -c '.artifacts[]' staging/parts-manifest.json | while read -r artifact; do
+            name=$(jq -r '.name' <<< "$artifact")
+            path=$(jq -r '.path' <<< "$artifact")
+            expected_sha=$(jq -r '.sha256' <<< "$artifact")
+            expected_size=$(jq -r '.size' <<< "$artifact")
+            cp "staging/$path" "$name"
+            test "$(stat -c '%s' "$name")" = "$expected_size"
+            echo "$expected_sha  $name" | sha256sum --check --strict
+            gh release upload "$TAG" "$name" --repo "$GITHUB_REPOSITORY" --clobber
+          done
+
+      - name: Remove staging branch
+        run: |
+          set -euo pipefail
+          STAGING_REF="$STAGING_REF_INPUT"
+          [[ "$STAGING_REF" =~ ^release-assets-v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$STAGING_REF"

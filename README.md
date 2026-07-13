@@ -45,9 +45,9 @@ For every release, bump `expo.version` and `expo.android.versionCode`, commit th
 npm run release:android -- --publish
 ```
 
-This creates a signed GitHub Release and uploads the same APK to the versioned R2 key and the fixed `latest.apk` URL. Run `--build-only` to build and verify without external writes.
+This creates signed `arm64-v8a` and legacy `armeabi-v7a` APKs, publishes both in the GitHub Release and R2, and advances the fixed `latest.apk` URL to the arm64 build. Large artifacts use a short-lived `release-assets-*` Git branch and a temporary, token-protected R2 multipart Worker; the workflow removes both after verified assembly. No Cloudflare credential is copied to GitHub. Run `--build-only` to build and verify without external writes.
 
-Public release APKs include the physical-device ABIs `arm64-v8a` and `armeabi-v7a`. Use a development build for x86/x86_64 emulators.
+The fixed latest URL serves `arm64-v8a`; the versioned legacy APK serves `armeabi-v7a`. Use a development build for x86/x86_64 emulators.
 
 ## License
 

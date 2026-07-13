@@ -70,6 +70,6 @@ After bumping both `expo.version` and `expo.android.versionCode`, and committing
 npm run release:android -- --publish
 ```
 
-The script verifies the source, regenerates Android, injects signing configuration using environment variable names only, builds and verifies the APK, creates the GitHub release, then uploads the versioned and fixed R2 objects.
+The script verifies the source, regenerates Android, injects signing configuration using environment variable names only, builds and verifies both APKs, creates the GitHub release, stages bounded chunks on a temporary Git branch, imports versioned/fixed R2 objects through a temporary authenticated multipart Worker, assembles Release assets in GitHub Actions, then removes the temporary branch and Worker.
 
-The public APK contains `arm64-v8a` and `armeabi-v7a`; x86/x86_64 are development-emulator targets and are intentionally excluded from the release artifact.
+The fixed public APK contains `arm64-v8a`; a separately signed versioned legacy APK contains `armeabi-v7a`. x86/x86_64 are development-emulator targets and are intentionally excluded from public release artifacts.
