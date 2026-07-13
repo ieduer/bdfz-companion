@@ -1,0 +1,65 @@
+name: Publish R2 release assets
+
+run-name: Publish ${{ inputs.tag }} assets from R2
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG_INPUT: ${{ inputs.tag }}
+      R2_BASE_URL: https://img.bdfz.net/apps/bdfz-companion
+    steps:
+      - name: Validate tag and release
+        run: |
+          set -euo pipefail
+          [[ "$TAG_INPUT" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh release view "$TAG_INPUT" --repo "$GITHUB_REPOSITORY" >/dev/null
+
+      - name: Download and verify R2 artifacts
+        run: |
+          set -euo pipefail
+          TAG="$TAG_INPUT"
+          VERSION="${TAG#v}"
+          PRIMARY="BDFZ-${TAG}-1.apk"
+          LEGACY="BDFZ-${TAG}-1-armeabi-v7a.apk"
+          curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
+            "$R2_BASE_URL/releases/$PRIMARY" --output "$PRIMARY"
+          curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
+            "$R2_BASE_URL/releases/$LEGACY" --output "$LEGACY"
+          curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
+            "$R2_BASE_URL/latest.json" --output latest.json
+          jq -e \
+            --arg version "$VERSION" \
+            --arg downloadUrl "$R2_BASE_URL/latest.apk" \
+            --arg legacyUrl "$R2_BASE_URL/releases/$LEGACY" \
+            '.version == $version
+              and .downloadUrl == $downloadUrl
+              and .legacyDownloadUrl == $legacyUrl
+              and (.sha256 | test("^[a-f0-9]{64}$"))
+              and (.legacySha256 | test("^[a-f0-9]{64}$"))' \
+            latest.json >/dev/null
+          echo "$(jq -r '.sha256' latest.json)  $PRIMARY" | sha256sum --check --strict
+          echo "$(jq -r '.legacySha256' latest.json)  $LEGACY" | sha256sum --check --strict
+
+      - name: Upload verified release assets
+        run: |
+          set -euo pipefail
+          TAG="$TAG_INPUT"
+          gh release upload "$TAG" \
+            "BDFZ-${TAG}-1.apk" \
+            "BDFZ-${TAG}-1-armeabi-v7a.apk" \
+            latest.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
