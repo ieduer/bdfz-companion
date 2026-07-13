@@ -1,195 +1,190 @@
-import { SymbolView } from 'expo-symbols';
-import { Link, Tabs, useRouter, usePathname } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Tabs, useRouter, usePathname } from 'expo-router';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme, SPACING, RADIUS } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-import { useResponsive } from '@/hooks/useResponsive';
+const TABS = [
+  { name: 'index', label: 'Home', icon: 'home-outline', iconActive: 'home' },
+  { name: 'learn', label: 'Learn', icon: 'book-outline', iconActive: 'book' },
+  { name: 'community', label: 'Community', icon: 'chatbubbles-outline', iconActive: 'chatbubbles' },
+  { name: 'tools', label: 'Tools', icon: 'grid-outline', iconActive: 'grid' },
+  { name: 'me', label: 'Me', icon: 'person-outline', iconActive: 'person' },
+];
 
 export default function TabLayout() {
-  const { isTablet } = useResponsive();
-  const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
+  const isWide = width >= 600;
+  const colors = useTheme();
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
-  // Tablet Layout (Navigation Rail on the left)
-  if (isTablet) {
-    const activeColor = Colors[colorScheme].tint;
-    const inactiveColor = Colors[colorScheme].tabIconDefault;
+  const getActiveTab = () => {
+    if (pathname === '/' || pathname === '/(tabs)') return 'index';
+    if (pathname.includes('/learn')) return 'learn';
+    if (pathname.includes('/community')) return 'community';
+    if (pathname.includes('/tools')) return 'tools';
+    if (pathname.includes('/me')) return 'me';
+    return 'index';
+  };
 
-    const navItems = [
-      {
-        name: 'index',
-        title: '學伴首頁',
-        icon: { ios: 'house.fill', android: 'home', web: 'home' },
-        route: '/',
-      },
-      {
-        name: 'two',
-        title: '語文學習',
-        icon: { ios: 'book.fill', android: 'book', web: 'book' },
-        route: '/two',
-      },
-    ];
+  const activeTab = getActiveTab();
 
+  const handleTabPress = (name: string) => {
+    if (name === 'index') {
+      router.push('/(tabs)');
+    } else {
+      router.push(`/(tabs)/${name}`);
+    }
+  };
+
+  const content = (
+    <Tabs
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: {
+          display: isWide ? 'none' : 'flex',
+          backgroundColor: colors.bgPrimary,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 4,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+          marginTop: 2,
+        },
+        tabBarIcon: ({ color, focused }) => {
+          const tab = TABS.find((t) => t.name === route.name);
+          if (!tab) return null;
+          return (
+            <Ionicons
+              name={(focused ? tab.iconActive : tab.icon) as any}
+              size={22}
+              color={color}
+            />
+          );
+        },
+      })}
+    >
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
+      <Tabs.Screen name="community" options={{ title: 'Community' }} />
+      <Tabs.Screen name="tools" options={{ title: 'Tools' }} />
+      <Tabs.Screen name="me" options={{ title: 'Me' }} />
+    </Tabs>
+  );
+
+  if (isWide) {
     return (
-      <View style={[styles.tabletContainer, { backgroundColor: Colors[colorScheme].background }]}>
-        {/* Navigation Rail / Sidebar */}
-        <View style={[styles.rail, { borderRightColor: Colors[colorScheme].tabIconDefault + '33' }]}>
-          <Text style={[styles.railTitle, { color: Colors[colorScheme].text }]}>BDFZ 學伴</Text>
-          <View style={styles.railItems}>
-            {navItems.map((item) => {
-              const isActive =
-                (item.route === '/' && pathname === '/') ||
-                (item.route !== '/' && pathname.startsWith(item.route));
-              const color = isActive ? activeColor : inactiveColor;
+      <View style={[styles.wideContainer, { backgroundColor: colors.bgPrimary }]}>
+        {/* Left Sidebar / Rail */}
+        <View
+          style={[
+            styles.sidebar,
+            {
+              backgroundColor: colors.bgSecondary,
+              borderRightColor: colors.border,
+              paddingTop: insets.top + SPACING.lg,
+              paddingBottom: insets.bottom + SPACING.lg,
+            },
+          ]}
+        >
+          {/* Logo */}
+          <View style={styles.logoContainer}>
+            <Text style={[styles.logoText, { color: colors.accent }]}>BDFZ</Text>
+            <Text style={[styles.logoSub, { color: colors.textMuted }]}>Companion</Text>
+          </View>
 
+          {/* Navigation Items */}
+          <View style={styles.sidebarNav}>
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.name;
               return (
                 <Pressable
-                  key={item.name}
-                  onPress={() => router.push(item.route as any)}
+                  key={tab.name}
+                  onPress={() => handleTabPress(tab.name)}
                   style={({ pressed }) => [
-                    styles.railItem,
-                    isActive && styles.railItemActive,
-                    pressed && { opacity: 0.7 }
+                    styles.sidebarItem,
+                    isActive && { backgroundColor: colors.accentMuted },
+                    pressed && { opacity: 0.8 },
                   ]}
                 >
-                  <SymbolView
-                    name={item.icon as any}
-                    tintColor={color}
-                    size={26}
+                  <Ionicons
+                    name={(isActive ? tab.iconActive : tab.icon) as any}
+                    size={24}
+                    color={isActive ? colors.accent : colors.textMuted}
                   />
-                  <Text style={[styles.railItemLabel, { color }]}>{item.title}</Text>
+                  <Text
+                    style={[
+                      styles.sidebarItemText,
+                      { color: isActive ? colors.accent : colors.textSecondary },
+                      isActive && { fontWeight: '600' },
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
                 </Pressable>
               );
             })}
           </View>
-          <Link href="/modal" asChild>
-            <Pressable style={styles.railFooter}>
-              <SymbolView
-                name={{ ios: 'info.circle.fill', android: 'info', web: 'info' }}
-                tintColor={inactiveColor}
-                size={24}
-              />
-            </Pressable>
-          </Link>
         </View>
 
-        {/* Content Area */}
-        <View style={styles.tabletContent}>
-          <Tabs
-            screenOptions={{
-              tabBarStyle: { display: 'none' }, // Hide bottom tab bar
-              headerShown: true,
-              headerStyle: { backgroundColor: Colors[colorScheme].background },
-              headerTintColor: Colors[colorScheme].text,
-            }}
-          >
-            <Tabs.Screen name="index" options={{ title: '學伴首頁' }} />
-            <Tabs.Screen name="two" options={{ title: '語文學習' }} />
-          </Tabs>
-        </View>
+        {/* Main Content Area */}
+        <View style={styles.wideMainContent}>{content}</View>
       </View>
     );
   }
 
-  // Mobile Layout (Bottom Tabs)
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-        headerShown: useClientOnlyValue(false, true),
-        tabBarStyle: {
-          backgroundColor: Colors[colorScheme].background,
-        }
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: '學伴',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{ ios: 'house.fill', android: 'home', web: 'home' }}
-              tintColor={color}
-              size={26}
-            />
-          ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable style={{ marginRight: 15 }}>
-                {({ pressed }) => (
-                  <SymbolView
-                    name={{ ios: 'info.circle', android: 'info', web: 'info' }}
-                    size={25}
-                    tintColor={Colors[colorScheme].text}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: '學習',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{ ios: 'book.fill', android: 'book', web: 'book' }}
-              tintColor={color}
-              size={26}
-            />
-          ),
-        }}
-      />
-    </Tabs>
-  );
+  return content;
 }
 
 const styles = StyleSheet.create({
-  tabletContainer: {
+  wideContainer: {
     flex: 1,
     flexDirection: 'row',
   },
-  rail: {
-    width: 110,
-    alignItems: 'center',
-    paddingVertical: 20,
+  sidebar: {
+    width: 220,
     borderRightWidth: 1,
+    paddingHorizontal: SPACING.md,
   },
-  railTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 40,
-    textAlign: 'center',
+  logoContainer: {
+    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.sm,
   },
-  railItems: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
+  logoText: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
-  railItem: {
-    width: '80%',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  railItemActive: {
-    backgroundColor: '#0284c71a',
-  },
-  railItemLabel: {
+  logoSub: {
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  sidebarNav: {
+    flex: 1,
+    gap: SPACING.xs,
+  },
+  sidebarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    gap: SPACING.md,
+  },
+  sidebarItemText: {
+    fontSize: 15,
     fontWeight: '500',
   },
-  railFooter: {
-    padding: 10,
-  },
-  tabletContent: {
+  wideMainContent: {
     flex: 1,
   },
 });
-

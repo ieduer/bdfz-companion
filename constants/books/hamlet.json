@@ -1,0 +1,243 @@
+{
+  "meta": {
+    "zhTitle": "哈姆雷特",
+    "zhTitle_hant": "哈姆雷特",
+    "zhTitle_hans": "哈姆雷特",
+    "enTitle": "Hamlet",
+    "author": "威廉·莎士比亞 William Shakespeare",
+    "year": "1601",
+    "tagline": "「生存還是毀滅，這是一個值得考慮的問題。」丹麥王子為父復仇的悲劇，四百年來被讀得最多、演得最多的一部戲。",
+    "about": [
+      "《哈姆雷特》（Hamlet）是莎士比亞約於1601年寫成的悲劇，也是他篇幅最長、被引用最多的劇作。丹麥王子漢姆萊脫自父王的鬼魂處得知叔父弒君篡位的真相，在復仇的義務與思想的猶疑之間輾轉，終於同歸於盡。",
+      "本站中文採用朱生豪譯本《漢姆萊脫》（世界書局《莎士比亞戲劇全集》本，據維基文庫），人名悉依朱譯原貌——「漢姆萊脫」即哈姆雷特，「莪菲莉霞」即奧菲利婭；英文原文據 Globe/Moby 標準本，逐段對照，並保留朱譯原註。"
+    ],
+    "howto": "輕點句首標記心動，或點擊「評點」共讀分享。點擊頂部「繁/简」可切換中文版本。",
+    "credit": "中文：朱生豪譯《漢姆萊脫》（世界書局《莎士比亞戲劇全集》，維基文庫底本，1996年起屬公有領域）；英文：Globe/Moby 版本。簡體中文由繁體自動對轉，人名保留朱譯原貌。",
+    "layout": "prose",
+    "theme": {
+      "paper": "#f3efe6",
+      "paper_2": "#e6dfd0",
+      "card": "#fdfbf5",
+      "cinnabar": "#7a1f2b",
+      "cinnabar_2": "#9c3140",
+      "cinnabar_glow": "rgba(122,31,43,.14)",
+      "ink": "#211d18",
+      "ink_soft": "#453e35",
+      "ink_faint": "#7b7267",
+      "line": "#cfc5b2",
+      "line_soft": "#e8e1d2"
+    }
+  },
+  "chapters": [
+    {
+      "id": "cast",
+      "label": "人物",
+      "label_hant": "人物",
+      "label_hans": "人物",
+      "zh": "劇中人物",
+      "zh_hant": "劇中人物",
+      "zh_hans": "剧中人物",
+      "en": "Dramatis Personae"
+    },
+    {
+      "id": "a1s1",
+      "label": "一幕一場",
+      "label_hant": "一幕一場",
+      "label_hans": "一幕一场",
+      "zh": "第一幕 · 第一場　厄耳錫諾；城堡前的露臺",
+      "zh_hant": "第一幕 · 第一場　厄耳錫諾；城堡前的露臺",
+      "zh_hans": "第一幕 · 第一场　厄耳锡诺；城堡前的露台",
+      "en": "SCENE I. Elsinore. A platform before the castle."
+    },
+    {
+      "id": "a1s2",
+      "label": "一幕二場",
+      "label_hant": "一幕二場",
+      "label_hans": "一幕二场",
+      "zh": "第一幕 · 第二場　城堡中的大廳",
+      "zh_hant": "第一幕 · 第二場　城堡中的大廳",
+      "zh_hans": "第一幕 · 第二场　城堡中的大厅",
+      "en": "SCENE II. A room of state in the castle."
+    },
+    {
+      "id": "a1s3",
+      "label": "一幕三場",
+      "label_hant": "一幕三場",
+      "label_hans": "一幕三场",
+      "zh": "第一幕 · 第三場　普隆涅斯家中一室",
+      "zh_hant": "第一幕 · 第三場　普隆涅斯家中一室",
+      "zh_hans": "第一幕 · 第三场　普隆涅斯家中一室",
+      "en": "SCENE III. A room in Polonius' house."
+    },
+    {
+      "id": "a1s4",
+      "label": "一幕四場",
+      "label_hant": "一幕四場",
+      "label_hans": "一幕四场",
+      "zh": "第一幕 · 第四場　露臺",
+      "zh_hant": "第一幕 · 第四場　露臺",
+      "zh_hans": "第一幕 · 第四场　露台",
+      "en": "SCENE IV. The platform."
+    },
+    {
+      "id": "a1s5",
+      "label": "一幕五場",
+      "label_hant": "一幕五場",
+      "label_hans": "一幕五场",
+      "zh": "第一幕 · 第五場　露臺的另一部分",
+      "zh_hant": "第一幕 · 第五場　露臺的另一部分",
+      "zh_hans": "第一幕 · 第五场　露台的另一部分",
+      "en": "SCENE V. Another part of the platform."
+    },
+    {
+      "id": "a2s1",
+      "label": "二幕一場",
+      "label_hant": "二幕一場",
+      "label_hans": "二幕一场",
+      "zh": "第二幕 · 第一場　普隆涅斯家中一室",
+      "zh_hant": "第二幕 · 第一場　普隆涅斯家中一室",
+      "zh_hans": "第二幕 · 第一场　普隆涅斯家中一室",
+      "en": "SCENE I. A room in POLONIUS' house."
+    },
+    {
+      "id": "a2s2",
+      "label": "二幕二場",
+      "label_hant": "二幕二場",
+      "label_hans": "二幕二场",
+      "zh": "第二幕 · 第二場　城堡中一室",
+      "zh_hant": "第二幕 · 第二場　城堡中一室",
+      "zh_hans": "第二幕 · 第二场　城堡中一室",
+      "en": "SCENE II. A room in the castle."
+    },
+    {
+      "id": "a3s1",
+      "label": "三幕一場",
+      "label_hant": "三幕一場",
+      "label_hans": "三幕一场",
+      "zh": "第三幕 · 第一場　城堡中的一室",
+      "zh_hant": "第三幕 · 第一場　城堡中的一室",
+      "zh_hans": "第三幕 · 第一场　城堡中的一室",
+      "en": "SCENE I. A room in the castle."
+    },
+    {
+      "id": "a3s2",
+      "label": "三幕二場",
+      "label_hant": "三幕二場",
+      "label_hans": "三幕二场",
+      "zh": "第三幕 · 第二場　城堡中的廳堂",
+      "zh_hant": "第三幕 · 第二場　城堡中的廳堂",
+      "zh_hans": "第三幕 · 第二场　城堡中的厅堂",
+      "en": "SCENE II. A hall in the castle."
+    },
+    {
+      "id": "a3s3",
+      "label": "三幕三場",
+      "label_hant": "三幕三場",
+      "label_hans": "三幕三场",
+      "zh": "第三幕 · 第三場　城堡中的一室",
+      "zh_hant": "第三幕 · 第三場　城堡中的一室",
+      "zh_hans": "第三幕 · 第三场　城堡中的一室",
+      "en": "SCENE III. A room in the castle."
+    },
+    {
+      "id": "a3s4",
+      "label": "三幕四場",
+      "label_hant": "三幕四場",
+      "label_hans": "三幕四场",
+      "zh": "第三幕 · 第四場　王后寢宮",
+      "zh_hant": "第三幕 · 第四場　王后寢宮",
+      "zh_hans": "第三幕 · 第四场　王后寝宫",
+      "en": "SCENE IV. The Queen's closet."
+    },
+    {
+      "id": "a4s1",
+      "label": "四幕一場",
+      "label_hant": "四幕一場",
+      "label_hans": "四幕一场",
+      "zh": "第四幕 · 第一場　城堡中的一室",
+      "zh_hant": "第四幕 · 第一場　城堡中的一室",
+      "zh_hans": "第四幕 · 第一场　城堡中的一室",
+      "en": "SCENE I. A room in the castle."
+    },
+    {
+      "id": "a4s2",
+      "label": "四幕二場",
+      "label_hant": "四幕二場",
+      "label_hans": "四幕二场",
+      "zh": "第四幕 · 第二場　城堡中的另一室",
+      "zh_hant": "第四幕 · 第二場　城堡中的另一室",
+      "zh_hans": "第四幕 · 第二场　城堡中的另一室",
+      "en": "SCENE II. Another room in the castle."
+    },
+    {
+      "id": "a4s3",
+      "label": "四幕三場",
+      "label_hant": "四幕三場",
+      "label_hans": "四幕三场",
+      "zh": "第四幕 · 第三場　同前；另一室",
+      "zh_hant": "第四幕 · 第三場　同前；另一室",
+      "zh_hans": "第四幕 · 第三场　同前；另一室",
+      "en": "SCENE III. Another room in the castle."
+    },
+    {
+      "id": "a4s4",
+      "label": "四幕四場",
+      "label_hant": "四幕四場",
+      "label_hans": "四幕四场",
+      "zh": "第四幕 · 第四場　丹麥原野",
+      "zh_hant": "第四幕 · 第四場　丹麥原野",
+      "zh_hans": "第四幕 · 第四场　丹麦原野",
+      "en": "SCENE IV. A plain in Denmark."
+    },
+    {
+      "id": "a4s5",
+      "label": "四幕五場",
+      "label_hant": "四幕五場",
+      "label_hans": "四幕五场",
+      "zh": "第四幕 · 第五場　厄耳錫諾；城堡中一室",
+      "zh_hant": "第四幕 · 第五場　厄耳錫諾；城堡中一室",
+      "zh_hans": "第四幕 · 第五场　厄耳锡诺；城堡中一室",
+      "en": "SCENE V. Elsinore. A room in the castle."
+    },
+    {
+      "id": "a4s6",
+      "label": "四幕六場",
+      "label_hant": "四幕六場",
+      "label_hans": "四幕六场",
+      "zh": "第四幕 · 第六場　同前；另一室",
+      "zh_hant": "第四幕 · 第六場　同前；另一室",
+      "zh_hans": "第四幕 · 第六场　同前；另一室",
+      "en": "SCENE VI. Another room in the castle."
+    },
+    {
+      "id": "a4s7",
+      "label": "四幕七場",
+      "label_hant": "四幕七場",
+      "label_hans": "四幕七场",
+      "zh": "第四幕 · 第七場　同前；另一室",
+      "zh_hant": "第四幕 · 第七場　同前；另一室",
+      "zh_hans": "第四幕 · 第七场　同前；另一室",
+      "en": "SCENE VII. Another room in the castle."
+    },
+    {
+      "id": "a5s1",
+      "label": "五幕一場",
+      "label_hant": "五幕一場",
+      "label_hans": "五幕一场",
+      "zh": "第五幕 · 第一場　墓地",
+      "zh_hant": "第五幕 · 第一場　墓地",
+      "zh_hans": "第五幕 · 第一场　墓地",
+      "en": "SCENE I. A churchyard."
+    },
+    {
+      "id": "a5s2",
+      "label": "五幕二場",
+      "label_hant": "五幕二場",
+      "label_hans": "五幕二场",
+      "zh": "第五幕 · 第二場　城堡中的廳堂",
+      "zh_hant": "第五幕 · 第二場　城堡中的廳堂",
+      "zh_hans": "第五幕 · 第二场　城堡中的厅堂",
+      "en": "SCENE II. A hall in the castle."
+    }
+  ]
+}

@@ -1,22 +1,18 @@
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { StatusBar, useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
-
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -24,7 +20,6 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -32,39 +27,68 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      
-      // 異步初始化推送通知，防阻塞主線程
-      const initPush = async () => {
-        try {
-          const { registerForPushNotificationsAsync } = await import('@/services/push');
-          const token = await registerForPushNotificationsAsync();
-          if (token) {
-            console.log('App Push Token successfully registered:', token);
-            // TODO: 當後端 API 就緒時，調用 my.bdfz.net/api/user/push-token 進行綁定
-          }
-        } catch (e) {
-          console.error('Failed to initialize push during startup', e);
-        }
-      };
-      initPush();
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return <RootLayoutNav />;
 }
 
+import { useIsDark } from '@/constants/theme';
+
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const isDark = useIsDark();
+
+  const theme = isDark
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: '#0F172A',
+          card: '#0F172A',
+          border: '#334155',
+          primary: '#6366F1',
+        },
+      }
+    : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: '#FFFFFF',
+          card: '#FFFFFF',
+          border: '#E2E8F0',
+          primary: '#4F46E5',
+        },
+      };
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+    <ThemeProvider value={theme}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={isDark ? '#0F172A' : '#FFFFFF'}
+      />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' },
+          animation: 'slide_from_right',
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="webview" />
+        <Stack.Screen name="read" />
+        <Stack.Screen name="post" />
+        <Stack.Screen name="composer" />
+        <Stack.Screen name="feedback" />
+        <Stack.Screen name="search" />
+        <Stack.Screen
+          name="modal"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
