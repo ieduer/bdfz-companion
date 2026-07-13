@@ -89,7 +89,12 @@ while (( $# )); do
   IMPORT_BODY="$(jq -nc --arg key "$KEY" --arg contentType "$CONTENT_TYPE" --arg source "$SOURCE" '{key:$key,contentType:$contentType,source:$source}')"
   IMPORT_RESPONSE="$(curl --config "$CURL_CONFIG" -H 'content-type: application/json' --data "$IMPORT_BODY" "$BASE_URL/import")"
   if ! jq -e '.size and .importedSize' <<< "$IMPORT_RESPONSE" >/dev/null; then
-    print -u2 "Import failed for $KEY: $(jq -r '.error // "unknown error"' <<< "$IMPORT_RESPONSE")"
+    if jq -e . <<< "$IMPORT_RESPONSE" >/dev/null 2>&1; then
+      IMPORT_ERROR="$(jq -r '.error // "unknown error"' <<< "$IMPORT_RESPONSE")"
+    else
+      IMPORT_ERROR="$(print -r -- "$IMPORT_RESPONSE" | tr '\r\n' ' ' | cut -c1-300)"
+    fi
+    print -u2 "Import failed for $KEY: $IMPORT_ERROR"
     exit 1
   fi
   REMOTE_SIZE="$(jq -er '.size' <<< "$IMPORT_RESPONSE")"

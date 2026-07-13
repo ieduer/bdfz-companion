@@ -77,8 +77,8 @@ export default {
     if (!response.ok) {
       return json({ error: `source returned ${response.status}` }, 502);
     }
-    const data = await response.arrayBuffer();
-    if (data.byteLength < 1 || data.byteLength > MAX_SOURCE_BYTES) {
+    const advertisedSize = Number(response.headers.get('content-length'));
+    if (!Number.isSafeInteger(advertisedSize) || advertisedSize < 1 || advertisedSize > MAX_SOURCE_BYTES || !response.body) {
       return json({ error: 'source has invalid size' }, 502);
     }
 
@@ -86,13 +86,42 @@ export default {
       httpMetadata: { contentType },
     });
     const parts = [];
+    const reader = response.body.getReader();
+    let buffer = new Uint8Array(PART_BYTES);
+    let bufferedBytes = 0;
+    let importedSize = 0;
+    let partNumber = 1;
     try {
-      for (let offset = 0, partNumber = 1; offset < data.byteLength; offset += PART_BYTES, partNumber += 1) {
-        const partData = data.slice(offset, Math.min(offset + PART_BYTES, data.byteLength));
-        parts.push(await upload.uploadPart(partNumber, partData));
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        importedSize += value.byteLength;
+        if (importedSize > MAX_SOURCE_BYTES) {
+          throw new Error('source exceeded maximum size');
+        }
+
+        let offset = 0;
+        while (offset < value.byteLength) {
+          const copyBytes = Math.min(PART_BYTES - bufferedBytes, value.byteLength - offset);
+          buffer.set(value.subarray(offset, offset + copyBytes), bufferedBytes);
+          bufferedBytes += copyBytes;
+          offset += copyBytes;
+          if (bufferedBytes === PART_BYTES) {
+            parts.push(await upload.uploadPart(partNumber, buffer));
+            partNumber += 1;
+            buffer = new Uint8Array(PART_BYTES);
+            bufferedBytes = 0;
+          }
+        }
+      }
+      if (importedSize !== advertisedSize || importedSize < 1) {
+        throw new Error('source size changed during import');
+      }
+      if (bufferedBytes > 0) {
+        parts.push(await upload.uploadPart(partNumber, buffer.slice(0, bufferedBytes)));
       }
       const object = await upload.complete(parts);
-      return json({ key: object.key, size: object.size, importedSize: data.byteLength, etag: object.etag });
+      return json({ key: object.key, size: object.size, importedSize, etag: object.etag });
     } catch (error) {
       await upload.abort().catch(() => undefined);
       return json({ error: error instanceof Error ? error.message : 'import failed' }, 502);
