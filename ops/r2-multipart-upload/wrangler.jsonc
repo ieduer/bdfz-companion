@@ -3,6 +3,7 @@
   "name": "bdfz-companion-r2-upload-temp",
   "main": "../../scripts/r2-multipart-worker.mjs",
   "compatibility_date": "2026-07-12",
+  "compatibility_flags": ["global_fetch_strictly_public"],
   "workers_dev": true,
   "observability": {
     "enabled": false

@@ -47,7 +47,7 @@ For every release, bump the matching version in `app.json`, `package.json`, and 
 npm run release:android -- --publish
 ```
 
-This creates signed `arm64-v8a` and legacy `armeabi-v7a` APKs, publishes both in the GitHub Release and R2, and advances the fixed `latest.apk` URL to the arm64 build. Large artifacts use a short-lived `release-assets-*` Git branch and a temporary, token-protected R2 multipart Worker; the workflow removes both after verified assembly. No Cloudflare credential is copied to GitHub. Run `--build-only` to build and verify without external writes.
+This creates signed `arm64-v8a` and legacy `armeabi-v7a` APKs, publishes both in the GitHub Release and R2, and advances the fixed `latest.apk` URL to the arm64 build. Versioned artifacts use a short-lived `release-assets-*` Git branch and a temporary, token-protected R2 multipart Worker; the fixed APK is uploaded from the locally verified artifact, and the workflow removes the temporary branch and Worker after verified assembly. No Cloudflare credential is copied to GitHub. Run `--build-only` to build and verify without external writes.
 
 The release script refuses to build when the three source version fields differ.
 

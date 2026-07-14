@@ -32,14 +32,15 @@ jobs:
           set -euo pipefail
           TAG="$TAG_INPUT"
           VERSION="${TAG#v}"
-          PRIMARY="BDFZ-${TAG}-1.apk"
-          LEGACY="BDFZ-${TAG}-1-armeabi-v7a.apk"
+          curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
+            "$R2_BASE_URL/latest.json" --output latest.json
+          VERSION_CODE="$(jq -er '.versionCode | select(type == "number" and . > 0 and floor == .)' latest.json)"
+          PRIMARY="BDFZ-${TAG}-${VERSION_CODE}.apk"
+          LEGACY="BDFZ-${TAG}-${VERSION_CODE}-armeabi-v7a.apk"
           curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
             "$R2_BASE_URL/releases/$PRIMARY" --output "$PRIMARY"
           curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
             "$R2_BASE_URL/releases/$LEGACY" --output "$LEGACY"
-          curl --fail --location --retry 3 --retry-delay 2 --proto '=https' --tlsv1.2 \
-            "$R2_BASE_URL/latest.json" --output latest.json
           jq -e \
             --arg version "$VERSION" \
             --arg downloadUrl "$R2_BASE_URL/latest.apk" \
@@ -57,9 +58,10 @@ jobs:
         run: |
           set -euo pipefail
           TAG="$TAG_INPUT"
+          VERSION_CODE="$(jq -er '.versionCode | select(type == "number" and . > 0 and floor == .)' latest.json)"
           gh release upload "$TAG" \
-            "BDFZ-${TAG}-1.apk" \
-            "BDFZ-${TAG}-1-armeabi-v7a.apk" \
+            "BDFZ-${TAG}-${VERSION_CODE}.apk" \
+            "BDFZ-${TAG}-${VERSION_CODE}-armeabi-v7a.apk" \
             latest.json \
             --repo "$GITHUB_REPOSITORY" \
             --clobber

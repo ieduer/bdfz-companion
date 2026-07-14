@@ -1,6 +1,6 @@
 # BDFZ Companion Verification Standard
 
-Last verified: 2026-07-12 PDT
+Last verified: 2026-07-13 PDT
 
 ## 1. Source of truth
 
@@ -77,6 +77,6 @@ After keeping `app.json`, `package.json`, and `package-lock.json` versions ident
 npm run release:android -- --publish
 ```
 
-The script verifies the source, regenerates Android, injects signing configuration using environment variable names only, builds and verifies both APKs, creates the GitHub release, stages bounded chunks on a temporary Git branch, imports versioned/fixed R2 objects through a temporary authenticated multipart Worker, assembles Release assets in GitHub Actions, then removes the temporary branch and Worker.
+The script verifies the source, regenerates Android, injects signing configuration using environment variable names only, builds and verifies both APKs, creates the GitHub release, stages APKs on a temporary Git branch, imports versioned R2 objects through a temporary authenticated multipart Worker, advances the fixed R2 APK from the locally verified arm64 artifact, assembles Release assets in GitHub Actions, then removes the temporary branch and Worker.
 
 The fixed public APK contains `arm64-v8a`; a separately signed versioned legacy APK contains `armeabi-v7a`. x86/x86_64 are development-emulator targets and are intentionally excluded from public release artifacts.

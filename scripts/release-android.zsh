@@ -110,8 +110,9 @@ gh release create "$TAG" "$METADATA_PATH" \
 MANIFEST_PATH="$(scripts/stage-release-apks.zsh "$TAG" "$APK_PATH" "$LEGACY_APK_PATH" | tail -1)"
 scripts/import-r2-from-github.zsh "$TAG" "$MANIFEST_PATH" \
   "$APK_NAME" "$R2_PREFIX/releases/$APK_NAME" application/vnd.android.package-archive \
-  "$LEGACY_APK_NAME" "$R2_PREFIX/releases/$LEGACY_APK_NAME" application/vnd.android.package-archive \
-  "$APK_NAME" "$R2_PREFIX/latest.apk" application/vnd.android.package-archive
+  "$LEGACY_APK_NAME" "$R2_PREFIX/releases/$LEGACY_APK_NAME" application/vnd.android.package-archive
+wrangler r2 object put "$BUCKET/$R2_PREFIX/latest.apk" \
+  --file "$APK_PATH" --content-type application/vnd.android.package-archive --remote
 wrangler r2 object put "$BUCKET/$R2_PREFIX/latest.json" \
   --file "$METADATA_PATH" --content-type application/json --remote
 
