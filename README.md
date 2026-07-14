@@ -8,6 +8,8 @@ BDFZ Companion is the Android/iOS shell for BDFZ learning, reading, community, t
 - Release metadata: <https://img.bdfz.net/apps/bdfz-companion/latest.json>
 - Versioned builds: [GitHub Releases](https://github.com/ieduer/bdfz-companion/releases)
 
+The Android app checks the R2 metadata on startup and when returning to the foreground, at most once every six hours. Users can also run a manual check from **Me → Check for updates**; downloads always open the fixed R2 APK URL in the system browser.
+
 ## Local development
 
 Requirements: Node.js, npm, JDK 17, Android SDK/ADB, and an Android device or emulator.
@@ -39,13 +41,15 @@ One-time signing setup on the trusted release Mac:
 zsh scripts/bootstrap-android-signing.zsh
 ```
 
-For every release, bump `expo.version` and `expo.android.versionCode`, commit the source, then run:
+For every release, bump the matching version in `app.json`, `package.json`, and `package-lock.json`, increment `expo.android.versionCode`, commit the source, then run:
 
 ```bash
 npm run release:android -- --publish
 ```
 
 This creates signed `arm64-v8a` and legacy `armeabi-v7a` APKs, publishes both in the GitHub Release and R2, and advances the fixed `latest.apk` URL to the arm64 build. Large artifacts use a short-lived `release-assets-*` Git branch and a temporary, token-protected R2 multipart Worker; the workflow removes both after verified assembly. No Cloudflare credential is copied to GitHub. Run `--build-only` to build and verify without external writes.
+
+The release script refuses to build when the three source version fields differ.
 
 The fixed latest URL serves `arm64-v8a`; the versioned legacy APK serves `armeabi-v7a`. Use a development build for x86/x86_64 emulators.
 

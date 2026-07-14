@@ -19,11 +19,17 @@ curl -sSI https://my.bdfz.net/site-auth.js
 curl -sS https://my.bdfz.net/api/session | jq '{authenticated}'
 curl -sS https://nav.bdfz.net/sites.json | jq 'type'
 curl -sSI https://img.bdfz.net/20250503004.webp
+curl -sS https://img.bdfz.net/apps/bdfz-companion/latest.json | jq '{version, versionCode, abi, sha256, downloadUrl}'
+curl -sSI https://img.bdfz.net/apps/bdfz-companion/latest.apk
 ```
 
 All shared-hub probes must succeed before and after a release.
 
-## 3. Feedback contract check
+## 3. Update and feedback contract checks
+
+`latest.json` must contain a three-part numeric version, positive integer `versionCode`, `arm64-v8a` ABI, lowercase SHA-256, release timestamp, and the exact fixed download URL `https://img.bdfz.net/apps/bdfz-companion/latest.apk`. The app rejects malformed metadata and never opens a download URL supplied by another host.
+
+On Android, the app checks this metadata at launch and on foreground activation, with a six-hour in-process interval, and exposes a manual check under Me. Automatic network failures stay silent; the manual check reports them without exposing response bodies.
 
 The app sends `siteKey=bdfz-companion`, category, severity, title, description, optional contact, and non-identifying app/platform context. A successful response contains `ok`, `stored`, a feedback ID, and the server-side Telegram delivery status.
 
@@ -48,8 +54,9 @@ The release build must use the private BDFZ release keystore. A debug-signed APK
 2. Open Me -> `意見反饋` and verify the form has no horizontal overflow.
 3. Open `連接用戶中心`, log in, accept the success dialog, return to Me, and confirm the page changes from guest to the authenticated profile. Confirm no token appears in page JavaScript or logs.
 4. Confirm an untrusted deep-link URL is blocked and the HTTP cinema entry opens only in the system browser.
-5. Run `npm run verify`, `npm audit --omit=dev`, and the shared-hub probes.
-6. Verify the GitHub release APK and fixed R2 APK have the same SHA-256 and signing certificate.
+5. Open Me -> `檢查更新`, confirm the installed version/build match the APK manifest, and confirm `重新下載` opens the fixed R2 APK URL in the system browser.
+6. Run `npm run verify`, `npm audit --omit=dev`, and the shared-hub probes.
+7. Verify the GitHub release APK and fixed R2 APK have the same SHA-256 and signing certificate.
 
 ## 6. Backup and restore
 
@@ -64,7 +71,7 @@ Before a release, retain the prior APK hash, Git tag, GitHub release, R2 version
 
 ## 8. Release command
 
-After bumping both `expo.version` and `expo.android.versionCode`, and committing a clean source tree:
+After keeping `app.json`, `package.json`, and `package-lock.json` versions identical, incrementing `expo.android.versionCode`, and committing a clean source tree:
 
 ```bash
 npm run release:android -- --publish

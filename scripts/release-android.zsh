@@ -37,6 +37,12 @@ done
 
 VERSION="$(node -p "require('./app.json').expo.version")"
 VERSION_CODE="$(node -p "require('./app.json').expo.android.versionCode")"
+PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+LOCK_VERSION="$(node -p "require('./package-lock.json').version")"
+if [[ "$VERSION" != "$PACKAGE_VERSION" || "$VERSION" != "$LOCK_VERSION" ]]; then
+  print -u2 "Version mismatch: app.json=$VERSION package.json=$PACKAGE_VERSION package-lock.json=$LOCK_VERSION"
+  exit 1
+fi
 TAG="v$VERSION"
 APK_NAME="BDFZ-v$VERSION-$VERSION_CODE.apk"
 LEGACY_APK_NAME="BDFZ-v$VERSION-$VERSION_CODE-armeabi-v7a.apk"

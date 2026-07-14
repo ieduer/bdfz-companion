@@ -7,6 +7,7 @@ import {
   Pressable,
   Switch,
   Alert,
+  Platform,
   useWindowDimensions,
 } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
@@ -14,6 +15,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, SPACING, RADIUS, getThemeSettings, updateThemeSettings } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { isAuthenticated, deleteToken, fetchFromUserCenter } from '@/services/auth';
+import { checkForAppUpdate, getInstalledAppVersion } from '@/services/appUpdate';
+import { showUpToDatePrompt, showUpdateAvailablePrompt } from '@/components/AppUpdatePrompt';
 
 export default function MeScreen() {
   const router = useRouter();
@@ -30,6 +33,8 @@ export default function MeScreen() {
   const [useDark, setUseDark] = useState(currentTheme.isDark);
   const [highContrast, setHighContrast] = useState(currentTheme.highContrast);
   const [profileData, setProfileData] = useState<any>(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const installedVersion = getInstalledAppVersion();
 
   const checkAuthAndLoadData = async () => {
     try {
@@ -77,6 +82,27 @@ export default function MeScreen() {
 
   const handleClearCache = () => {
     Alert.alert('清理成功', '已清理 24.5 MB 離線課本與圖片快取');
+  };
+
+  const handleCheckForUpdate = async () => {
+    if (checkingUpdate) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('僅適用於 Android', '此入口用於下載 Android APK。');
+      return;
+    }
+    setCheckingUpdate(true);
+    try {
+      const result = await checkForAppUpdate();
+      if (result.updateAvailable) {
+        showUpdateAvailablePrompt(result);
+      } else {
+        showUpToDatePrompt(result);
+      }
+    } catch {
+      Alert.alert('檢查更新失敗', '無法讀取 BDFZ R2 版本資料，請確認網路後再試。');
+    } finally {
+      setCheckingUpdate(false);
+    }
   };
 
   return (
@@ -213,6 +239,32 @@ export default function MeScreen() {
             <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
           </Pressable>
 
+          {/* App Update */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="檢查應用更新"
+            disabled={checkingUpdate}
+            onPress={handleCheckForUpdate}
+            style={({ pressed }) => [
+              styles.settingsRow,
+              { borderBottomColor: colors.separator },
+              pressed && { opacity: 0.8 },
+            ]}
+          >
+            <View style={styles.rowLabelContainer}>
+              <Ionicons name="cloud-download-outline" size={18} color={colors.accent} />
+              <View>
+                <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>檢查更新</Text>
+                <Text style={[styles.rowHint, { color: colors.textMuted }]}>最新版 APK 由 BDFZ R2 提供</Text>
+              </View>
+            </View>
+            <Text style={[styles.rowValueText, { color: colors.textMuted }]}>
+              {checkingUpdate
+                ? '檢查中…'
+                : `v${installedVersion.version} (${installedVersion.buildNumber})`}
+            </Text>
+          </Pressable>
+
           {/* Clear Cache */}
           <Pressable
             onPress={() => {
@@ -233,7 +285,11 @@ export default function MeScreen() {
 
           {/* About Screen */}
           <Pressable
-            onPress={() => Alert.alert('關於 BDFZ SUEN', '版本: v2.0.0 (2026)\nExpo SDK 57 / JSC\nCloudflare Edge Session Bridge')}
+            onPress={() => Alert.alert(
+              '關於 BDFZ SUEN',
+              `版本：v${installedVersion.version} (${installedVersion.buildNumber})\n`
+                + 'Expo SDK 57\nCloudflare Edge Session Bridge',
+            )}
             style={({ pressed }) => [styles.settingsRow, pressed && { opacity: 0.8 }]}
           >
             <View style={styles.rowLabelContainer}>

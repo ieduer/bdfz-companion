@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 
+import AppUpdatePrompt from '@/components/AppUpdatePrompt';
+
 export {
   ErrorBoundary,
 } from 'expo-router';
@@ -64,6 +66,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={theme}>
+      <AppUpdatePrompt />
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? '#0F172A' : '#FFFFFF'}
