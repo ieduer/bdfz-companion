@@ -48,6 +48,19 @@ adb -s <DEVICE_ID> shell am start -W -n net.bdfz.companion/.MainActivity
 
 The release build must use the private BDFZ release keystore. A debug-signed APK is never publishable.
 
+Every release candidate selects and records one registered physical phone:
+OnePlus 9 Pro `LE2120` (hardware serial `c5467d2b`) or OnePlus 8 Pro `IN2020`
+(hardware serial `6393cccf`). Wireless ADB endpoints are not device identity.
+The selected phone must upgrade from the prior accepted release and pass
+package uniqueness, cold/foreground launch, Back, the core flow,
+offline/recovery, local data/Session/outbox/content-version persistence, the
+self-update states and scoped fatal/ANR review. If that phone is unavailable or
+fails, the release is blocked; a second phone and emulators are supplemental.
+The same phone must also pass a reversible expanded-layout run: record
+size/density/rotation/font/global and per-network proxy/keep-awake, obtain an
+App-observed width of at least 840dp, test 200% font, portrait, landscape and
+multi-window, then restore and read back every captured setting.
+
 ## 5. Dependency regression
 
 1. Launch the installed APK and confirm Home, Learn, Community, Tools, and Me remain reachable.
