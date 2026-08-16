@@ -197,6 +197,24 @@ export const SERVICES: ServiceDefinition[] = [
     connectionMode: ConnectionMode.WEBVIEW
   },
   {
+    id: 'curriculum_atlas',
+    categoryId: 'reference',
+    label: '課標演變',
+    url: 'https://curriculum.bdfz.net/',
+    accessibilityLabel: '中國歷年課程標準與考試評價演變',
+    order: 1.5,
+    connectionMode: ConnectionMode.WEBVIEW
+  },
+  {
+    id: 'xue_learn',
+    categoryId: 'reference',
+    label: '全科自學',
+    url: 'https://xue.bdfz.net/',
+    accessibilityLabel: '學 · 初高中全科自學平台',
+    order: 1.6,
+    connectionMode: ConnectionMode.WEBVIEW
+  },
+  {
     id: 'chinese_course',
     categoryId: 'reference',
     label: '語文課',
@@ -266,6 +284,15 @@ export const SERVICES: ServiceDefinition[] = [
     url: 'https://cal.bdfz.net/',
     accessibilityLabel: '校曆',
     order: 9,
+    connectionMode: ConnectionMode.WEBVIEW
+  },
+  {
+    id: 'quote',
+    categoryId: 'reference',
+    label: '典冊',
+    url: 'https://quote.bdfz.net/',
+    accessibilityLabel: '典冊 · 覓句引典 · 文學引文搜尋與驗證',
+    order: 10,
     connectionMode: ConnectionMode.WEBVIEW
   },
 
