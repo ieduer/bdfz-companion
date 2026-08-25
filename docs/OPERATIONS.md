@@ -36,7 +36,7 @@ npm run test:apis-native-waiver
 npm run verify
 ```
 
-`config/apis-native-waiver.json` pins App `1.1.0` / Android `versionCode=2` and the reviewed `services/urlPolicy.ts` digest. `scripts/check-apis-native-waiver.mjs` scans the complete application TS/TSX/JSON source set and exits nonzero with `豁免前提已失效，必須執行註冊設備煙霧測試` when the prerequisite no longer holds. The existing Android release script calls `npm run verify` before build or publication, so the guard is part of the release check path rather than an unattached script.
+`config/apis-native-waiver.json` pins App `1.1.0` / Android `versionCode=2` and the reviewed `services/urlPolicy.ts` digest. `scripts/check-apis-native-waiver.mjs` scans the complete application TS/TSX/JSON source set and exits nonzero with `Companion 有界豁免前提已失效，必須執行註冊設備煙霧測試` when the prerequisite no longer holds. The existing Android release script calls `npm run verify` before build or publication, so the guard is part of the release check path rather than an unattached script.
 
 The exemption automatically expires when any of the following occurs:
 
