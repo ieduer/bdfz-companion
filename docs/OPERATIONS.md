@@ -1,21 +1,50 @@
 # bdfz-companion operations
 
-Last normalized: 2026-08-10 PDT
-Owner: review_required
-Lifecycle: unknown-candidate
-Data class: review_required
-Documentation status: generated from local source, Git/GitHub audit, project catalog, and live Cloudflare inventory; unresolved facts remain fail-closed.
+Last verified: 2026-08-25 PDT
+Owner: suen
+Lifecycle: active native App
+Data class: session-bearing App shell; site data remains owned by the embedded Web properties
+Documentation status: source and release verification authority reviewed; physical-device behavior remains separately gated.
 
 ## Quick start
 
-- Canonical local path: `/Users/ylsuen/CF/bdfz-companion`
+- Canonical local path: `/Users/ylsuen/CF/apps/bdfz-companion`
 - Git authority: `ieduer/bdfz-companion`
-- Current local branch/HEAD: `master` / `78dd5fa6d7f1228adedfa3ae2b4cee42805e892b`
-- Runtime config: `not detected; review_required`
+- Canonical branch/baseline: `master` / `b51f22d`
+- Current public release: `v1.1.0`, Android `versionCode=2`; this transaction does not publish a new binary
 - Current state: [PROJECT_STATE.md](../PROJECT_STATE.md)
 - Workspace resource routing: [project resource index](../../reports/operations/project_resource_index.md)
 - Documentation standard: [project operations standard](../../runbooks/project_operations_documentation_standard.md)
-- Production mutation is forbidden until exact owner, target, bindings, backup, verification, and rollback have fresh readback.
+- Production mutation is forbidden until exact owner, target, version, signing/build inputs, verification, and rollback have fresh readback.
+
+## Bounded APIS native-contract waiver
+
+The 2026-08-25 APIS AQ.Ab rotation and resilience transaction grants a bounded source-grounded exemption for one surface only: **native direct APIS contract testing**. It is not a pass for physical-device WebView behavior, Session persistence, or navigation behavior.
+
+Reproducible source evidence:
+
+- this repository is Expo 57 / React Native and its application source is TypeScript/TSX;
+- the guarded TS/TSX/JSON source set contains no `apis.bdfz.net`, standalone `APIS`, APIS request-header markers, or direct Gemini Developer API host;
+- native remote calls target site services such as `my.bdfz.net`, while WebView destinations are BDFZ/RDFZ site domains whose APIS behavior is verified at the owning site;
+- WebView implementations are `app/webview.tsx` and `app/(tabs)/community.tsx`; `services/urlPolicy.ts` is the navigation trust boundary.
+
+Executable guard:
+
+```bash
+npm run check:apis-native-waiver
+npm run test:apis-native-waiver
+npm run verify
+```
+
+`config/apis-native-waiver.json` pins App `1.1.0` / Android `versionCode=2` and the reviewed `services/urlPolicy.ts` digest. `scripts/check-apis-native-waiver.mjs` scans the complete application TS/TSX/JSON source set and exits nonzero with `豁免前提已失效，必須執行註冊設備煙霧測試` when the prerequisite no longer holds. The existing Android release script calls `npm run verify` before build or publication, so the guard is part of the release check path rather than an unattached script.
+
+The exemption automatically expires when any of the following occurs:
+
+1. App source gains a direct APIS or Gemini Developer API call;
+2. App version or Android versionCode changes;
+3. `services/urlPolicy.ts` changes, including an AI-capable WebView allowlist expansion.
+
+After expiry, update the waiver only after a registered-device smoke verifies WebView loading, Session persistence, and navigation. Do not regenerate the pinned digest merely to make the check green.
 
 ## Existing project documentation relationship
 
