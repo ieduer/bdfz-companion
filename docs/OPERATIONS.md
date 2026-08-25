@@ -10,7 +10,7 @@ Documentation status: source and release verification authority reviewed; physic
 
 - Canonical local path: `/Users/ylsuen/CF/apps/bdfz-companion`
 - Git authority: `ieduer/bdfz-companion`
-- Canonical branch/baseline: `master` / `b51f22d`
+- Canonical branch/baseline: `master` / `229bbab92930ac070b9c0631b4c60c5ba96dc226`
 - Current public release: `v1.1.0`, Android `versionCode=2`; this transaction does not publish a new binary
 - Current state: [PROJECT_STATE.md](../PROJECT_STATE.md)
 - Workspace resource routing: [project resource index](../../reports/operations/project_resource_index.md)
