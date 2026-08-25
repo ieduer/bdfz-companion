@@ -5,7 +5,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const INVALIDATION_MESSAGE = '豁免前提已失效，必須執行註冊設備煙霧測試';
+const INVALIDATION_MESSAGE = 'Companion 有界豁免前提已失效，必須執行註冊設備煙霧測試';
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.json']);
 const EXCLUDED_DIRECTORIES = new Set([
   '.expo', '.git', '.github', 'android', 'dist', 'docs', 'node_modules', 'scripts',
