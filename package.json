@@ -35,9 +35,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+    "check:apis-native-waiver": "node scripts/check-apis-native-waiver.mjs",
+    "test:apis-native-waiver": "node scripts/test-apis-native-waiver.mjs",
     "test:url-policy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/test-url-policy.mjs",
     "test:update-policy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/test-app-update-policy.mjs",
-    "verify": "npm run typecheck && npm run test:url-policy && npm run test:update-policy && expo install --check",
+    "verify": "npm run typecheck && npm run test:apis-native-waiver && npm run check:apis-native-waiver && npm run test:url-policy && npm run test:update-policy && expo install --check",
     "release:android": "zsh scripts/release-android.zsh"
   },
   "private": true
