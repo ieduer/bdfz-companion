@@ -21,7 +21,7 @@ function expectFailure(label, mutate, expected) {
   } catch (error) {
     message = error.message;
   }
-  if (!message.includes('豁免前提已失效，必須執行註冊設備煙霧測試') || !message.includes(expected)) {
+  if (!message.includes('Companion 有界豁免前提已失效，必須執行註冊設備煙霧測試') || !message.includes(expected)) {
     throw new Error(`${label} did not fail with expected evidence: ${message}`);
   }
 }
