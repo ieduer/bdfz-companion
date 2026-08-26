@@ -10,7 +10,7 @@ Documentation status: source and release verification authority reviewed; physic
 
 - Canonical local path: `/Users/ylsuen/CF/apps/bdfz-companion`
 - Git authority: `ieduer/bdfz-companion`
-- Canonical branch/baseline: `master` / `229bbab92930ac070b9c0631b4c60c5ba96dc226`
+- Canonical branch/baseline: `master` / `b99b807e999df26a21193bdf285d712801ff6432`
 - Current public release: `v1.1.0`, Android `versionCode=2`; this transaction does not publish a new binary
 - Current state: [PROJECT_STATE.md](../PROJECT_STATE.md)
 - Workspace resource routing: [project resource index](../../reports/operations/project_resource_index.md)
@@ -159,3 +159,26 @@ update `PROJECT_STATE.md` in the same task.
 Every AI closeout must record changed files, generated artifacts, tests, live
 version/deployment, rollback, dirty-tree state, unresolved follow-ups, and the
 manual/state updates in `reports/agent_action_log.jsonl`. Chat is not a durable handoff.
+
+## GitHub Actions allowance and release routing
+
+Workspace authority: `/Users/ylsuen/CF/runbooks/github_actions_usage_and_workload_routing.md`.
+The 2026-08-22 account audit is
+`/Users/ylsuen/CF/reports/github_actions_usage_audit_2026-08-22.md`.
+
+- The two default-branch workflows are explicit `workflow_dispatch` release
+  publishers. Keep them manual-only; do not add push, pull-request, or schedule
+  triggers for routine APK assembly.
+- APK build/verification belongs on the owned Mac/device path. Actions may only
+  assemble or publish an approved tagged release from verified staging/R2
+  material; GitHub Release/R2 is the durable asset authority.
+- When these workflows are next changed, add an explicit 15-minute job timeout
+  and bounded network requests. No Actions artifact retention is needed.
+- The repository is public, so standard hosted-runner minutes do not consume
+  the private 2,000-minute allowance; this does not waive timeout, permission,
+  exact-tag, checksum, rollback, or device-acceptance gates.
+- No schedule is authorized. Any future schedule must declare owner, monthly
+  minute envelope, timeouts, concurrency, disable path and last duration
+  readback in this manual.
+- Current incident reset: 2026-09-01 00:00 UTC (2026-08-31 17:00 PDT;
+  2026-09-01 08:00 CST). Do not mass-replay blocked workflows after reset.
