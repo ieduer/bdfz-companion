@@ -12,3 +12,8 @@ Deployment status: existing `v1.1.0` binary unchanged; this transaction changes 
 Rollback anchor: revert the bounded-waiver guard commit; the existing `v1.1.0` binary is unaffected
 Operations authority: `/Users/ylsuen/CF/apps/bdfz-companion/docs/OPERATIONS.md`
 Ownership status: suen; production/App release still requires the documented release gate
+
+## 2026-08-26 frozen catalog parity
+
+- The existing `ai_school_selection` WebView service is retired from source; the existing gk service remains.
+- No native binary is released for this source-only parity change. Older installed binaries remain safe because `750.bdfz.net` redirects to gk.

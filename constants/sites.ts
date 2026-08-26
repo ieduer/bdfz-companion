@@ -455,15 +455,6 @@ export const SERVICES: ServiceDefinition[] = [
     connectionMode: ConnectionMode.WEBVIEW
   },
   {
-    id: 'ai_school_selection',
-    categoryId: 'tools',
-    label: 'AI 選校',
-    url: 'https://750.bdfz.net/',
-    accessibilityLabel: 'AI 選校',
-    order: 9,
-    connectionMode: ConnectionMode.WEBVIEW
-  },
-  {
     id: 'honor_documents',
     categoryId: 'tools',
     label: '榮譽文書',

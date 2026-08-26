@@ -182,3 +182,7 @@ The 2026-08-22 account audit is
   readback in this manual.
 - Current incident reset: 2026-09-01 00:00 UTC (2026-08-31 17:00 PDT;
   2026-09-01 08:00 CST). Do not mass-replay blocked workflows after reset.
+
+## 2026-08-26 750 retirement
+
+The frozen service catalog removes the existing 750 WebView entry and adds no replacement because gk is already present. No APK/iOS release is authorized by this change. Verify TypeScript/catalog tests; older binaries are covered by the permanent host redirect.
