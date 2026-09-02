@@ -1,6 +1,6 @@
 # bdfz-companion operations
 
-Last verified: 2026-08-25 PDT
+Last verified: 2026-09-02 PDT
 Owner: suen
 Lifecycle: active native App
 Data class: session-bearing App shell; site data remains owned by the embedded Web properties
@@ -10,7 +10,7 @@ Documentation status: source and release verification authority reviewed; physic
 
 - Canonical local path: `/Users/ylsuen/CF/apps/bdfz-companion`
 - Git authority: `ieduer/bdfz-companion`
-- Canonical branch/baseline: `master` / `b99b807e999df26a21193bdf285d712801ff6432`
+- Canonical branch/baseline: `master` / `56a3cdc39838654a32e5d9ec5e4f90677364dc6c`
 - Current public release: `v1.1.0`, Android `versionCode=2`; this transaction does not publish a new binary
 - Current state: [PROJECT_STATE.md](../PROJECT_STATE.md)
 - Workspace resource routing: [project resource index](../../reports/operations/project_resource_index.md)
@@ -110,6 +110,18 @@ Detected package entrypoints (presence is not proof they currently pass):
 
 Run only commands supported by the current project toolchain and verify expected outputs in the project before using them as release evidence.
 
+### 2026-09-02 User Center interaction release gate
+
+At exact source `master@56a3cdc39838654a32e5d9ec5e4f90677364dc6c`, Node 24.18.0 verification established:
+
+- TypeScript checking passed.
+- Native APIS waiver fixtures and the fail-closed waiver guard passed across 53 source files; the reviewed App identity remains `1.1.0` / Android `versionCode=2`.
+- URL-policy and update-policy tests passed.
+- `expo install --check` did not pass: the repository has 15 package versions behind Expo SDK 57.0.19's expected versions. This is a source compatibility blocker, not authority to rewrite the dependency lockfile during an interaction audit.
+- The connected-device inventory was empty. Therefore authenticated WebView/session and offline/reload/reconnect recovery remain unverified and block the synchronized User Center release.
+
+No APK/iOS build, dependency update, App publication, authentication write, or production change was made. Reconcile dependencies and run a registered-device smoke as a separate reviewed transaction before treating the App gate as accepted.
+
 ## Health and business-path verification
 
 Catalog health probes:
@@ -146,7 +158,7 @@ For data-backed projects, immutable code rollback does not restore D1/KV/R2/DO/Q
 5. Dependency regression: matrix fan-out, shared hubs, clone family, App/VPS as applicable.
 6. Backup/restore: catalog evidence above; missing exact evidence is blocking for writes/deletion.
 7. Rollback/failback: catalog authority above, refreshed live before release.
-8. Last verified: review_required.
+8. Last verified: 2026-09-02 source checks at `56a3cdc`; registered-device behavior remains blocked and is not inferred from source checks.
 
 ## Synchronized documentation and handoff
 
